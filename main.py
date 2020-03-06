@@ -1,5 +1,7 @@
 from generator import Generator
 from discriminator import Discriminator
+from keras.datasets import mnist
+
 
 IMG_SIZE = 28
 CHANNELS = 1
@@ -15,21 +17,28 @@ class GAN():
         self.channels = CHANNELS
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
 
+        # Set generator and discriminator
         self.generator = Generator().pathmind(self.img_shape)
         self.discriminator = Discriminator().pathmind(self.img_shape)
 
 
-# Initialize GAN
+# Initialize GAN, generator and discriminator
 gan = GAN()
 
 # Generator
 print('|--------------------------------------------|\n' +
       '                 Generator\n' +
       '|--------------------------------------------|\n')
-gan.generator.summary()
+# gan.generator.summary()
 
 # Discriminator
 print('|--------------------------------------------|\n' +
-      '                 Discriminator\n' +
+      '               Discriminator\n' +
       '|--------------------------------------------|\n')
-gan.discriminator.summary()
+# gan.discriminator.summary()
+
+# Load Data
+print('|--------------------------------------------|\n' +
+      '                  Load Data\n' +
+      '|--------------------------------------------|\n')
+(x_train, y_train), (x_test, y_test) = mnist.load_data()

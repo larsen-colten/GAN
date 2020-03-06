@@ -1,10 +1,7 @@
 import numpy as np
-from keras.layers import (Activation, BatchNormalization, Dense, Dropout,
-                          Flatten, Input, Reshape, ZeroPadding2D)
+from keras.layers import BatchNormalization, Dense, Reshape
 from keras.layers.advanced_activations import LeakyReLU
-from keras.layers.convolutional import Conv2D, UpSampling2D
-from keras.models import Model, Sequential
-from keras.optimizers import Adam
+from keras.models import Sequential
 
 
 class Generator():
@@ -25,6 +22,7 @@ class Generator():
         model.add(Dense(np.prod(img_shape), activation='tanh'))
         model.add(Reshape(img_shape))
 
-        model.compile(loss='binary_crossentropy', optimizer='adam', metrics= ['accuracy'])
+        model.compile(loss='binary_crossentropy',
+                      optimizer='adam', metrics=['accuracy'])
 
         return model
