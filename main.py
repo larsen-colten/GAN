@@ -19,7 +19,7 @@ class GAN():
 
         # Set generator and discriminator
         self.generator = Generator().pathmind(self.img_shape)
-        self.discriminator = Discriminator().pathmind(self.img_shape)
+        self.discriminator = Discriminator().small(self.img_shape)
 
 
 # Initialize GAN, generator and discriminator
@@ -35,7 +35,7 @@ print('|--------------------------------------------|\n' +
 print('|--------------------------------------------|\n' +
       '               Discriminator\n' +
       '|--------------------------------------------|\n')
-# gan.discriminator.summary()
+gan.discriminator.summary()
 
 # Load Data
 print('|--------------------------------------------|\n' +

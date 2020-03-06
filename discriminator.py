@@ -6,7 +6,6 @@ from keras.layers.advanced_activations import LeakyReLU
 class Discriminator():
     # Example from https://pathmind.com/wiki/generative-adversarial-network-gan
     def pathmind(self, img_shape):
-
         model = Sequential()
 
         model.add(Flatten(input_shape=img_shape))
@@ -18,6 +17,23 @@ class Discriminator():
 
         model.compile(loss='binary_crossentropy',
                       optimizer='adam', metrics=['accuracy'])
+
+        return model
+
+    def small(self, img_shape):
+        model = Sequential()
+
+        model.add(Conv2D(input_shape=img_shape, filters=10, kernel_size=(3, 3),
+                         padding='same', activation='relu'))
+        model.add(MaxPool2D(pool_size=(2, 2), strides=(2, 2)))
+        model.add(Conv2D(filters=10, kernel_size=(3, 3),
+                         padding='same', activation='relu'))
+        model.add(MaxPool2D(pool_size=(2, 2), strides=(2, 2)))
+
+        model.add(Flatten())
+        model.add(Dense(128, activation="relu"))
+        model.add(Dense(128, activation="relu"))
+        model.add(Dense(2, activation='sigmoid'))
 
         return model
 
