@@ -33,7 +33,10 @@ class Discriminator():
         model.add(Flatten())
         model.add(Dense(128, activation="relu"))
         model.add(Dense(128, activation="relu"))
-        model.add(Dense(2, activation='sigmoid'))
+        model.add(Dense(1, activation='sigmoid'))
+
+        model.compile(loss='binary_crossentropy',
+                      optimizer='adam', metrics=['accuracy'])
 
         return model
 
@@ -76,7 +79,7 @@ class Discriminator():
         model.add(Dense(4096, activation="relu"))
         model.add(Dense(4096, activation="relu"))
         model.add(Dense(1000, activation="relu"))
-        model.add(Dense(2, activation='sigmoid'))
+        model.add(Dense(1, activation='sigmoid'))
 
         model.compile(loss='binary_crossentropy',
                       optimizer='adam', metrics=['accuracy'])
