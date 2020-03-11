@@ -5,6 +5,7 @@ import numpy as np
 from keras.layers import Input
 from keras.models import Sequential, Model
 from keras.optimizers import Adam
+from matplotlib import pyplot as plt
 
 # import cv2
 
@@ -54,15 +55,22 @@ class GAN:
         for epoch in range(epochs):
             # Generate images
             noise = np.random.normal(0, 1, (100, 100))
-            # cv2.imshow(noise[0:10])
             imgs_gen = self.generator.predict(noise)
-            # imgs_gen.reshape((*imgs_gen.shape[:-1], -1))
 
             # Train discriminator on half generated images and half
             idx = np.random.randint(0, self.x_train.shape[0], 100)
             imgs_train = self.x_train[idx]
+            imgs_train = (imgs_train.astype(np.float32) - 127.5) / 127.5
+            imgs_train = np.expand_dims(imgs_train, axis=3)
+            np.expand_dims(imgs_train, axis=3)
 
-            # imgs = np.stack([imgs_train, imgs_gen])
+            valid = np.ones((100, 1))
+            fake = np.zeros((100, 1))
+
+            d_loss_real = self.discriminator.train_on_batch(imgs_train, valid)
+            d_loss_fake = self.discriminator.train_on_batch(imgs_gen, fake)
+            d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
+            print(d_loss)
 
 
 # Initialize GAN, generator and discriminator
