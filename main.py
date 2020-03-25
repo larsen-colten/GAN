@@ -12,8 +12,8 @@ from generator import Generator
 
 IMG_SIZE = 28
 CHANNELS = 1
-BATCH_SIZE = 10
-EPOCHS = 10
+BATCH_SIZE = 100
+EPOCHS = 100
 VALIDATION_SPLIT = 0.10
 LATENT_DIM = 100
 
@@ -86,7 +86,7 @@ class GAN:
             d_loss2, d_acc2 = self.discriminator.train_on_batch(
                 fake_images, fake_images_labels
             )
-            # Train disriminator on fake images
+            # Train disriminator on real images
             d_loss2, d_acc2 = self.discriminator.train_on_batch(
                 real_images, real_images_labels
             )
