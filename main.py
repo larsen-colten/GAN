@@ -86,6 +86,10 @@ class GAN:
             d_loss2, d_acc2 = self.discriminator.train_on_batch(
                 fake_images, fake_images_labels
             )
+            # Train disriminator on fake images
+            d_loss2, d_acc2 = self.discriminator.train_on_batch(
+                real_images, real_images_labels
+            )
 
             # Create latent points for Generator
             x_gan = np.random.randn(self.latent_dim * batch_size)
