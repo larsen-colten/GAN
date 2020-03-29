@@ -1,29 +1,9 @@
-import numpy as np
-from keras.layers import (Activation, BatchNormalization, Conv2DTranspose,
-                          Dense, Reshape)
-from keras.layers.advanced_activations import LeakyReLU
+from keras.layers import Activation, BatchNormalization, Conv2DTranspose, Dense, Reshape
+from keras.layers.convolutional import Conv2D, UpSampling2D
 from keras.models import Sequential
 
 
 class Generator:
-    def small(self, img_shape, latent_dim):
-        noise_shape = (latent_dim,)
-
-        model = Sequential()
-        model.add(Dense(256, input_shape=noise_shape))
-        model.add(LeakyReLU(alpha=0.2))
-        model.add(BatchNormalization(momentum=0.8))
-        model.add(Dense(512))
-        model.add(LeakyReLU(alpha=0.2))
-        model.add(BatchNormalization(momentum=0.8))
-        model.add(Dense(1024))
-        model.add(LeakyReLU(alpha=0.2))
-        model.add(BatchNormalization(momentum=0.8))
-        model.add(Dense(np.prod(img_shape), activation="tanh"))
-        model.add(Reshape(img_shape))
-
-        return model
-
     def fcc_gan(self, img_shape, latent_dim):
         noise_shape = (latent_dim,)
 
@@ -44,4 +24,22 @@ class Generator:
         model.add(Conv2DTranspose(1, (2, 2), strides=(2, 2)))
         model.add(Activation("tanh"))
 
+        return model
+
+    def dc_gan(self, img_shape, latent_dim):
+        noise_shape = (latent_dim,)
+
+        model = Sequential()
+        model.add(Dense(1024, input_shape=noise_shape))
+        model.add(Activation("tanh"))
+        model.add(Dense(128 * 7 * 7))
+        model.add(BatchNormalization())
+        model.add(Activation("tanh"))
+        model.add(Reshape((7, 7, 128), input_shape=(128 * 7 * 7,)))
+        model.add(UpSampling2D(size=(2, 2)))
+        model.add(Conv2D(64, (5, 5), padding="same"))
+        model.add(Activation("tanh"))
+        model.add(UpSampling2D(size=(2, 2)))
+        model.add(Conv2D(1, (5, 5), padding="same"))
+        model.add(Activation("tanh"))
         return model

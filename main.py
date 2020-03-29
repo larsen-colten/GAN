@@ -1,10 +1,6 @@
-import random
-
 import numpy as np
 from keras.datasets import mnist
-from keras.layers import Input
-from keras.models import Model, Sequential
-from keras.optimizers import Adam
+from keras.models import Sequential
 from matplotlib import pyplot as plt
 
 from discriminator import Discriminator
@@ -12,8 +8,8 @@ from generator import Generator
 
 IMG_SIZE = 28
 CHANNELS = 1
-BATCH_SIZE = 100
-EPOCHS = 100
+BATCH_SIZE = 50
+EPOCHS = 50
 VALIDATION_SPLIT = 0.10
 LATENT_DIM = 100
 
@@ -37,8 +33,7 @@ class GAN:
         model = Sequential()
         model.add(gen)
         model.add(dis)
-        opt = Adam(lr=0.0002, beta_1=0.5)
-        model.compile(loss="binary_crossentropy", optimizer=opt)
+        model.compile(loss="binary_crossentropy", optimizer="adam")
         return model
 
     def load_data(self):
@@ -46,13 +41,14 @@ class GAN:
         X = np.expand_dims(x_train, axis=-1)
         x_indexes = y_train == 8
         X = x_train[x_indexes]
-        x = X.astype("float32")
         X = (X - 127.5) / 127.5
         self.dataset = X
+        return "MINST dataset"
 
     def train(self, epoch, batch_size):
         batches_per_epoch = int(self.dataset.shape[0] / batch_size)
         number_of_steps = batches_per_epoch * epoch
+        num_steps_per_epoch = number_of_steps / epoch
         half_batch = int(batch_size / 2)
         d1_hist, d2_hist, g_hist, a1_hist, a2_hist = (
             list(),
@@ -99,11 +95,11 @@ class GAN:
 
             g_loss = self.gan.train_on_batch(x_gan, y_gan)
 
-            if i % 100 == 0:
+            if i % num_steps_per_epoch == 0:
                 print(
-                    ">%d, d1=%.3f, d2=%.3f g=%.3f, a1=%d, a2=%d"
+                    "Epoch: %d || d1_loss = %.3f || d2_loss = %.3f || g_loss = %.3f || acc1 = %d || acc2 = %d"
                     % (
-                        i,
+                        i / num_steps_per_epoch,
                         d_loss1,
                         d_loss2,
                         g_loss,
@@ -119,12 +115,13 @@ class GAN:
             a1_hist.append(d_acc1)
             a2_hist.append(d_acc2)
 
-            if i % 1000 == 0:
-                self.sample_images(i / 1000)
+            if i % num_steps_per_epoch == 0:
+                self.sample_images(i / num_steps_per_epoch)
 
+        # Plot
         self.plot_history(d1_hist, d2_hist, g_hist, a1_hist, a2_hist)
 
-    def sample_images(self, epoch):
+    def sample_images(self, number):
         rows, column = 5, 5
         noise = np.random.normal(0, 1, (rows * column, self.latent_dim))
         gen_imgs = self.generator.predict(noise)
@@ -139,7 +136,8 @@ class GAN:
                 axs[i, j].imshow(gen_imgs[cnt, :, :, 0], cmap="gray")
                 axs[i, j].axis("off")
                 cnt += 1
-        fig.savefig("images/%d.png" % epoch)
+        fig.savefig("images_fccgan/%d.png" % number)
+        plt.show()
         plt.close()
 
     def plot_history(self, d1_hist, d2_hist, g_hist, a1_hist, a2_hist):
@@ -148,12 +146,15 @@ class GAN:
         plt.plot(d1_hist, label="d-real")
         plt.plot(d2_hist, label="d-fake")
         plt.plot(g_hist, label="gen")
+        plt.gca().axes.get_xaxis().set_visible(False)
         plt.legend()
         # plot discriminator accuracy
         plt.subplot(2, 1, 2)
         plt.plot(a1_hist, label="acc-real")
         plt.plot(a2_hist, label="acc-fake")
         plt.legend()
+        plt.gca().axes.get_xaxis().set_visible(False)
+        plt.show()
         # save plot to file
         plt.savefig("results/plot.png")
         plt.close()
@@ -167,7 +168,7 @@ gan = GAN()
 
 # Generator
 print(
-    "|--------------------------------------------|\n"
+    "\n|--------------------------------------------|\n"
     + "                 Generator\n"
     + "|--------------------------------------------|\n"
 )
@@ -175,7 +176,7 @@ gan.generator.summary()
 
 # Discriminator
 print(
-    "|--------------------------------------------|\n"
+    "\n|--------------------------------------------|\n"
     + "               Discriminator\n"
     + "|--------------------------------------------|\n"
 )
@@ -183,15 +184,15 @@ gan.discriminator.summary()
 
 # Load Data
 print(
-    "|--------------------------------------------|\n"
+    "\n|--------------------------------------------|\n"
     + "                  Load Data\n"
     + "|--------------------------------------------|\n"
 )
-gan.load_data()
-print("Data Loaded\n")
+print(gan.load_data())
+print("Data Loaded")
 
 print(
-    "|--------------------------------------------|\n"
+    "\n|--------------------------------------------|\n"
     + "                  Training \n"
     + "|--------------------------------------------|\n"
 )

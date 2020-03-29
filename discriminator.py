@@ -1,7 +1,14 @@
-from keras.layers import (Activation, BatchNormalization, Conv2D, Dense,
-                          Flatten, MaxPool2D)
+from keras.layers import (
+    Activation,
+    BatchNormalization,
+    Conv2D,
+    Dense,
+    Flatten,
+    MaxPool2D,
+)
 from keras.layers.advanced_activations import LeakyReLU
 from keras.models import Sequential
+from keras.optimizers import Adam
 
 
 class Discriminator:
@@ -11,10 +18,10 @@ class Discriminator:
         model.add(Conv2D(32, (3, 3), strides=(2, 2), input_shape=img_shape))
         model.add(BatchNormalization())
         model.add(LeakyReLU(alpha=0.2))
-        model.add(Conv2D(64, (3, 3), strides=(2, 2), input_shape=img_shape))
+        model.add(Conv2D(64, (3, 3), strides=(2, 2)))
         model.add(BatchNormalization())
         model.add(LeakyReLU(alpha=0.2))
-        model.add(Conv2D(128, (3, 3), strides=(2, 2), input_shape=img_shape))
+        model.add(Conv2D(128, (3, 3), strides=(2, 2)))
         model.add(BatchNormalization())
         model.add(LeakyReLU(alpha=0.2))
         model.add(Flatten())
@@ -27,103 +34,26 @@ class Discriminator:
         model.add(Dense(1))
         model.add(Activation("sigmoid"))
 
-        model.compile(
-            loss="binary_crossentropy", optimizer="adam", metrics=["accuracy"]
-        )
+        opt = Adam(lr=0.0002, beta_1=0.5)
+        model.compile(loss="binary_crossentropy", optimizer="sgd", metrics=["accuracy"])
 
         return model
 
-    def small(self, img_shape):
+    def dc_gan(self, img_shape):
         model = Sequential()
 
-        model.add(
-            Conv2D(
-                input_shape=img_shape,
-                filters=10,
-                kernel_size=(3, 3),
-                padding="same",
-                activation="relu",
-            )
-        )
-        model.add(MaxPool2D(pool_size=(2, 2), strides=(2, 2)))
-        model.add(
-            Conv2D(filters=10, kernel_size=(3, 3), padding="same", activation="relu")
-        )
-        model.add(MaxPool2D(pool_size=(2, 2), strides=(2, 2)))
-
+        model.add(Conv2D(64, (5, 5), padding="same", input_shape=img_shape))
+        model.add(Activation("tanh"))
+        model.add(MaxPool2D(pool_size=(2, 2)))
+        model.add(Conv2D(128, (5, 5)))
+        model.add(Activation("tanh"))
+        model.add(MaxPool2D(pool_size=(2, 2)))
         model.add(Flatten())
-        model.add(Dense(128, activation="relu"))
-        model.add(Dense(128, activation="relu"))
-        model.add(Dense(1, activation="sigmoid"))
+        model.add(Dense(1024))
+        model.add(Activation("tanh"))
+        model.add(Dense(1))
+        model.add(Activation("sigmoid"))
 
-        model.compile(
-            loss="binary_crossentropy", optimizer="adam", metrics=["accuracy"]
-        )
-
-        return model
-
-    # Implementation of VGG 16 Classifier model
-    def vgg_16(self, img_shape):
-        model = Sequential()
-        model.add(
-            Conv2D(
-                input_shape=img_shape,
-                filters=64,
-                kernel_size=(3, 3),
-                padding="same",
-                activation="relu",
-            )
-        )
-        model.add(
-            Conv2D(filters=64, kernel_size=(3, 3), padding="same", activation="relu")
-        )
-        model.add(MaxPool2D(pool_size=(2, 2), strides=(2, 2)))
-        model.add(
-            Conv2D(filters=128, kernel_size=(3, 3), padding="same", activation="relu")
-        )
-        model.add(
-            Conv2D(filters=128, kernel_size=(3, 3), padding="same", activation="relu")
-        )
-        model.add(MaxPool2D(pool_size=(2, 2), strides=(2, 2)))
-        model.add(
-            Conv2D(filters=256, kernel_size=(3, 3), padding="same", activation="relu")
-        )
-        model.add(
-            Conv2D(filters=256, kernel_size=(3, 3), padding="same", activation="relu")
-        )
-        model.add(
-            Conv2D(filters=256, kernel_size=(3, 3), padding="same", activation="relu")
-        )
-        model.add(MaxPool2D(pool_size=(2, 2), strides=(2, 2)))
-        model.add(
-            Conv2D(filters=512, kernel_size=(3, 3), padding="same", activation="relu")
-        )
-        model.add(
-            Conv2D(filters=512, kernel_size=(3, 3), padding="same", activation="relu")
-        )
-        model.add(
-            Conv2D(filters=512, kernel_size=(3, 3), padding="same", activation="relu")
-        )
-        model.add(MaxPool2D(pool_size=(2, 2), strides=(2, 2)))
-        model.add(
-            Conv2D(filters=512, kernel_size=(3, 3), padding="same", activation="relu")
-        )
-        model.add(
-            Conv2D(filters=512, kernel_size=(3, 3), padding="same", activation="relu")
-        )
-        model.add(
-            Conv2D(filters=512, kernel_size=(3, 3), padding="same", activation="relu")
-        )
-        model.add(MaxPool2D(pool_size=(2, 2), strides=(2, 2)))
-
-        model.add(Flatten())
-        model.add(Dense(4096, activation="relu"))
-        model.add(Dense(4096, activation="relu"))
-        model.add(Dense(1000, activation="relu"))
-        model.add(Dense(1, activation="sigmoid"))
-
-        model.compile(
-            loss="binary_crossentropy", optimizer="adam", metrics=["accuracy"]
-        )
+        model.compile(loss="binary_crossentropy", optimizer="sgd", metrics=["accuracy"])
 
         return model
