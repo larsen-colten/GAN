@@ -48,7 +48,6 @@ class GAN:
     def train(self, epoch, batch_size):
         batches_per_epoch = int(self.dataset.shape[0] / batch_size)
         number_of_steps = batches_per_epoch * epoch
-        num_steps_per_epoch = number_of_steps / epoch
         half_batch = int(batch_size / 2)
         d1_hist, d2_hist, g_hist, a1_hist, a2_hist = (
             list(),
@@ -95,11 +94,11 @@ class GAN:
 
             g_loss = self.gan.train_on_batch(x_gan, y_gan)
 
-            if i % num_steps_per_epoch == 0:
+            if i % batches_per_epoch == 0:
                 print(
                     "Epoch: %d || d1_loss = %.3f || d2_loss = %.3f || g_loss = %.3f || acc1 = %d || acc2 = %d"
                     % (
-                        i / num_steps_per_epoch,
+                        i / batches_per_epoch,
                         d_loss1,
                         d_loss2,
                         g_loss,
