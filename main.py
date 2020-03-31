@@ -8,7 +8,7 @@ from generator import Generator
 
 IMG_SIZE = 28
 CHANNELS = 1
-BATCH_SIZE = 50
+BATCH_SIZE = 100
 EPOCHS = 50
 VALIDATION_SPLIT = 0.10
 LATENT_DIM = 100
@@ -24,8 +24,8 @@ class GAN:
         self.latent_dim = LATENT_DIM
 
         # Set generator and discriminator
-        self.generator = Generator().fcc_gan(self.img_shape, LATENT_DIM)
-        self.discriminator = Discriminator().fcc_gan(self.img_shape)
+        self.generator = Generator().dc_gan(self.img_shape, LATENT_DIM)
+        self.discriminator = Discriminator().dc_gan(self.img_shape)
         self.gan = self.define_gan(self.generator, self.discriminator)
 
     def define_gan(self, gen, dis):
@@ -114,8 +114,8 @@ class GAN:
             a1_hist.append(d_acc1)
             a2_hist.append(d_acc2)
 
-            if i % num_steps_per_epoch == 0:
-                self.sample_images(i / num_steps_per_epoch)
+            if i % batches_per_epoch == 0:
+                self.sample_images(i / batches_per_epoch)
 
         # Plot
         self.plot_history(d1_hist, d2_hist, g_hist, a1_hist, a2_hist)
