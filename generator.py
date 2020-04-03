@@ -1,6 +1,7 @@
 from keras.layers import Activation, BatchNormalization, Conv2DTranspose, Dense, Reshape
 from keras.layers.convolutional import Conv2D, UpSampling2D
 from keras.models import Sequential
+from keras.layers.advanced_activations import LeakyReLU
 
 
 class Generator:
@@ -42,4 +43,28 @@ class Generator:
         model.add(UpSampling2D(size=(2, 2)))
         model.add(Conv2D(1, (5, 5), padding="same"))
         model.add(Activation("tanh"))
+        return model
+    
+    def tf_tut (self, img_shappe, latent_dim):
+        noise_shape = (latent_dim,)
+        
+        model = Sequential()
+        model.add(Dense(12544, use_bias=False, input_shape=noise_shape))
+        model.add(BatchNormalization())
+        model.add(LeakyReLU())
+        
+        model.add(Reshape((7, 7, 256)))
+        assert model.output_shape == (None, 7, 7, 256)
+        
+        model.add(Conv2DTranspose(128, (5, 5), strides=(1, 1), padding='same', use_bias=False))
+        model.add(BatchNormalization())
+        model.add(LeakyReLU())
+
+        model.add(Conv2DTranspose(64, (5, 5), strides=(2, 2), padding='same', use_bias=False))
+        model.add(BatchNormalization())
+        model.add(LeakyReLU())
+        
+        model.add(Conv2DTranspose(1, (5, 5), strides=(2, 2), padding="same", use_bias=False))
+        assert model.output_shape == (None, 28, 28, 1)
+        
         return model

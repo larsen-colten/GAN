@@ -2,15 +2,17 @@ import numpy as np
 from keras.datasets import mnist
 from keras.models import Sequential
 from matplotlib import pyplot as plt
+import cv2
+import glob
+import tensorflow as tf
 
 from discriminator import Discriminator
 from generator import Generator
 
 IMG_SIZE = 28
 CHANNELS = 1
-BATCH_SIZE = 100
-EPOCHS = 50
-VALIDATION_SPLIT = 0.10
+BATCH_SIZE = 12
+EPOCHS = 100
 LATENT_DIM = 100
 
 
@@ -24,8 +26,8 @@ class GAN:
         self.latent_dim = LATENT_DIM
 
         # Set generator and discriminator
-        self.generator = Generator().dc_gan(self.img_shape, LATENT_DIM)
-        self.discriminator = Discriminator().dc_gan(self.img_shape)
+        self.generator = Generator().tf_tut(self.img_shape, LATENT_DIM)
+        self.discriminator = Discriminator().tf_tut(self.img_shape)
         self.gan = self.define_gan(self.generator, self.discriminator)
 
     def define_gan(self, gen, dis):
@@ -41,9 +43,26 @@ class GAN:
         X = np.expand_dims(x_train, axis=-1)
         x_indexes = y_train == 8
         X = x_train[x_indexes]
-        X = (X - 127.5) / 127.5
+        X = (x_train - 127.5) / 127.5
+        print(X.shape)
         self.dataset = X
         return "MINST dataset"
+
+    def load_data_retriever(self):
+        image_list = []
+        for filename in glob.glob("retriever_data/*.jpg"):
+            img = cv2.imread(filename)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            img = cv2.resize(img, (IMG_SIZE, IMG_SIZE))
+            image_list.append(img)
+
+        plt.imshow(image_list[0])
+        plt.show()
+        image_list = np.array(image_list)
+        
+        self.dataset = image_list
+        return 'Standford Dogs dataset'
+            
 
     def train(self, epoch, batch_size):
         batches_per_epoch = int(self.dataset.shape[0] / batch_size)
@@ -135,7 +154,7 @@ class GAN:
                 axs[i, j].imshow(gen_imgs[cnt, :, :, 0], cmap="gray")
                 axs[i, j].axis("off")
                 cnt += 1
-        fig.savefig("images_fccgan/%d.png" % number)
+        fig.savefig("retriever_dc/%d.png" % number)
         plt.show()
         plt.close()
 
@@ -153,9 +172,8 @@ class GAN:
         plt.plot(a2_hist, label="acc-fake")
         plt.legend()
         plt.gca().axes.get_xaxis().set_visible(False)
+        plt.savefig("results/plot_retriever_dc.png")
         plt.show()
-        # save plot to file
-        plt.savefig("results/plot.png")
         plt.close()
 
 
@@ -187,7 +205,7 @@ print(
     + "                  Load Data\n"
     + "|--------------------------------------------|\n"
 )
-print(gan.load_data())
+print(gan.load_data_retriever())
 print("Data Loaded")
 
 print(
