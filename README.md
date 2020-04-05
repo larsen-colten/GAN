@@ -22,7 +22,7 @@ The resulting graph of the loses and accuracy of the discriminator show that the
 This model is a deep connected GAN. This is one of the more common types of models that you can find. Basing our model on several others, this performed much better than the FCC GAN. Below is the results from the 1st, 5th, and 25th epoch.  
 ![1st epoch](results/dc_mnist_25/0.png)  
 ![5st epoch](results/dc_mnist_25/4.png)  
-![25st epoch](results/dc_mnist_25/24.png)  
+![25st epoch](results/dc_mnist_25/25.png)  
 The resulting graph is much more stable with the generator and the discriminator competing. 
 ![Results DC_GAN](results/dc_mnist_25/plot_dc.png)
 
